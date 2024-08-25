@@ -9,13 +9,13 @@ function EnterName() {
       return;
     }
     localStorage.setItem("name", document.getElementById("name").value);
-    window.location.href = "/";
+    window.location.href = "/home";
   };
 
   return (
     <div className="overflow-hidden flex flex-col items-center justify-center h-screen w-full">
       <div className="flex flex-col items-center justify-center gap-12 h-screen w-full">
-        <div className="absolute inset-0 -z-10 h-full w-full dark:bg-bg-dark bg-bg-light bg-[linear-gradient(to_right,#f0f0f0_2px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:6rem_4rem] dark:bg-[linear-gradient(to_right,#0f172a_2px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] dark:bg-[size:6rem_4rem]"></div>
+        <div className="absolute inset-0 -z-10 h-full w-full bg-bg-light dark:bg-bg-dark bg-[linear-gradient(to_right,#d1d5db_1px,transparent_1px),linear-gradient(to_bottom,#d1d5db_1px,transparent_1px)] bg-[size:6rem_4rem] dark:bg-[linear-gradient(to_right,#111827_1px,transparent_1px),linear-gradient(to_bottom,#111827_1px,transparent_1px)]"></div>
         <h1 className="text-center animate-wiggle text-3xl md:text-5xl font-semibold text-gray-800 dark:text-slate-100">
           Bienvenido a NotesEasy.
         </h1>
