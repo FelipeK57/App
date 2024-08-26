@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils import timezone
+from django.utils import timezone, dateformat
 
 # Create your models here.
 class Task(models.Model):
@@ -9,4 +9,6 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.tittle
+        # Formato de la fecha: día/mes/año hora:minuto
+        formatted_date = dateformat.format(self.date, 'd/m/Y H:i')
+        return f"{self.tittle} - {formatted_date}"

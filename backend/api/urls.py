@@ -28,4 +28,5 @@ urlpatterns = [
     path('update-list', views.update_list),
     path('delete-list', views.delete_list),
     path('get-lists', views.get_lists),
+    path('create-user', views.create_user),
 ]

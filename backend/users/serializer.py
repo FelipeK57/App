@@ -1,14 +1,10 @@
 from rest_framework import serializers
-from .models import User
-from django.contrib.auth.models import User
+from .models import Users
+from Tasks_List.serializer import ListSerializer
 
 class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
 
-class UserSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    listas = ListSerializer(many=True)
     class Meta:
-        model = User
+        model = Users
         fields = '__all__'

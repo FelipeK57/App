@@ -4,6 +4,7 @@ from tasks.models import Task
 
 class List(models.Model):
     name = models.CharField(max_length=200)
+    emoji = models.CharField(max_length=200, null=True)
     tasks = models.ManyToManyField(Task)
 
     def __str__(self):
