@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import Button from "./Button";
 import { useState } from "react";
-
+import PropTypes from "prop-types";
 /**
  * @function Sidebar
  * @description A component that renders a sidebar. It toggles its visibility when the button is clicked.
  * @returns {JSX.Element} The JSX code for the component.
  */
-function Sidebar() {
+function Sidebar({ setListSelected }) {
   /**
    * @param {boolean} openBar Whether the sidebar is open or not.
    * @type {boolean}
@@ -20,6 +20,12 @@ function Sidebar() {
    */
   const toggleBar = () => {
     setOpenBar(!openBar);
+  };
+
+  const [createList, setCreateList] = useState(false);
+
+  const toggleCreateList = () => {
+    setCreateList(!createList);
   };
 
   const taskHogar = [
@@ -70,6 +76,12 @@ function Sidebar() {
       task: taskHogar,
     },
   ];
+
+  const pickList = () => {
+    toggleBar();
+    setListSelected(true);
+    localStorage.setItem("listSelected", true);
+  };
 
   return (
     <div>
@@ -125,7 +137,7 @@ function Sidebar() {
             {lists.map((list) => (
               <Link
                 key={list.id}
-                onClick={toggleBar}
+                onClick={pickList}
                 to={`/home/list/${list.id}`}
                 state={{ list: list }}
               >
@@ -134,7 +146,27 @@ function Sidebar() {
                 </p>
               </Link>
             ))}
-            <button className="flex ml-2 items-center gap-2 font-semibold">
+            {createList ? (
+              <div className="flex flex-col gap-2">
+                <input
+                  className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  type="text"
+                  placeholder="Ejemplo: 🙃..."
+                />
+
+                <input
+                  className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  type="text"
+                  placeholder="Ejemplo: Trabajo..."
+                />
+
+                <Button content="Crear" />
+              </div>
+            ) : null}
+            <button
+              onClick={toggleCreateList}
+              className="flex ml-4 items-center gap-2 font-semibold"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -189,5 +221,9 @@ function Sidebar() {
     </div>
   );
 }
+
+Sidebar.propTypes = {
+  setListSelected: PropTypes.func,
+};
 
 export default Sidebar;
