@@ -1,31 +1,51 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import Task from "./Task";
 import CreateTask from "./CreateTask";
 import DetailsTask from "./DetailsTask";
-
+import axios from "axios";
 function TaskList() {
   const params = useParams();
   const location = useLocation();
-  const [tasks, setTasks] = useState([]);
   const list = location.state.list;
+  const [tasks, setTasks] = useState(list.tasks);
   const [showForm, setShowForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [taskSelected, setTaskSelected] = useState({});
+  const [tasksPending, setTasksPending] = useState([]);
+  const [tasksCompleted, setTasksCompleted] = useState([]);
 
-  useEffect(() => {
-    setTasks(list.task);
-  }, [list]);
+  const changeState = async (taskId) => {
+    try {
+      const task = tasks.find((task) => task.id === taskId);
+      let stateTask = !task.completed;
 
-  const changeState = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, state: !task.state } : task
-    );
-    setTasks(updatedTasks);
+      const updatedTasks = tasks.map((task) =>
+        task.id === taskId ? { ...task, completed: stateTask } : task
+      );
+
+      setTasks(updatedTasks);
+      const response = await axios.post("http://localhost:8000/update-task", {
+        id: taskId,
+        completed: stateTask,
+      });
+      console.log("Respuesta del backend:", response.data.task.completed);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
   };
 
-  const tasksPending = tasks.filter((task) => !task.state);
-  const tasksCompleted = tasks.filter((task) => task.state);
+  const updateTasks = (task) => {
+    console.log(task);
+    setTasks((tasks) => [...tasks, task]);
+  };
+
+  useEffect(() => {
+    const pendingTasks = tasks.filter((task) => !task.completed);
+    const completedTasks = tasks.filter((task) => task.completed);
+    setTasksPending(pendingTasks);
+    setTasksCompleted(completedTasks);
+  }, [tasks]);
 
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -40,16 +60,22 @@ function TaskList() {
     <div className="text-text-light dark:text-text-dark flex flex-col gap-4">
       {showForm ? (
         <div className="fixed flex justify-center items-center w-full inset-0 bg-slate-800 bg-opacity-40 z-[1000]">
-          <CreateTask function={toggleForm} />
+          <CreateTask
+            list_id={params.id}
+            onClose={toggleForm}
+            updateTasks={updateTasks}
+          />
         </div>
       ) : null}
-      {
-        showDetails ? (
-          <div className="fixed flex justify-center items-center w-full inset-0 bg-slate-800 bg-opacity-40 z-[1000]">
-            <DetailsTask title={taskSelected.name} description={taskSelected.description}  function={toggleDetails} />
-          </div>
-        ) : null
-      }
+      {showDetails ? (
+        <div className="fixed flex justify-center items-center w-full inset-0 bg-slate-800 bg-opacity-40 z-[1000]">
+          <DetailsTask
+            title={taskSelected.tittle}
+            description={taskSelected.description}
+            function={toggleDetails}
+          />
+        </div>
+      ) : null}
       <button
         onClick={toggleForm}
         className="shadow-xl flex flex-row items-center gap-2 w-full px-4 py-2 text-text-light dark:text-text-dark bg-component-task-light dark:bg-component-task-dark font-semibold rounded-lg"
@@ -81,9 +107,9 @@ function TaskList() {
           tasksPending.map((task) => (
             <Task
               key={task.id}
-              name={task.name}
+              name={task.tittle}
               date={task.date}
-              state={task.state}
+              state={task.completed}
               onClick={() => changeState(task.id)}
               function={() => toggleDetails(task)}
             />
@@ -100,9 +126,9 @@ function TaskList() {
           tasksCompleted.map((task) => (
             <Task
               key={task.id}
-              name={task.name}
+              name={task.tittle}
               date={task.date}
-              state={task.state}
+              state={task.completed}
               onClick={() => changeState(task.id)}
               function={() => toggleDetails(task)}
             />

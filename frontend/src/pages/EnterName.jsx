@@ -1,15 +1,29 @@
 import { useState } from "react";
 import ToggleMode from "@/components/ToggleMode";
 import Button from "@/components/Button";
+import axios from "axios";
 function EnterName() {
   const [error, setError] = useState(false);
-  const saveName = () => {
+  const [messageError, setMessageError] = useState("");
+  const saveName = async () => {
     if (!document.getElementById("name").value) {
       setError(true);
+      setMessageError("El campo esta vacío, intenta escribir tu nombre.");
       return;
     }
-    localStorage.setItem("name", document.getElementById("name").value);
-    window.location.href = "/home";
+    try {
+      const response = await axios.post("http://localhost:8000/create-user", {
+        name: document.getElementById("name").value,
+      });
+      console.log(response.data);
+      localStorage.setItem("name", response.data.user.name);
+      localStorage.setItem("id", response.data.user.id);
+      window.location.href = "/home";
+    } catch (error) {
+      setError(true);
+      console.log(error);
+      setMessageError("El nombre ya existe, intenta con otro.");
+    }
   };
 
   return (
@@ -33,7 +47,7 @@ function EnterName() {
           />
           {error && (
             <p className="text-red-600 animate-fade">
-              El campo esta vacío, intenta escribir tu nombre.
+              {messageError}
             </p>
           )}
         </div>

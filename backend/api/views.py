@@ -82,7 +82,7 @@ def update_task(request):
         task.description = description
     if date:
         task.date = date
-    if completed:
+    if completed is not None:
         task.completed = completed
     task.save()
 

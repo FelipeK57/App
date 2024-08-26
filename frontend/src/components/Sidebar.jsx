@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import Button from "./Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 /**
  * @function Sidebar
  * @description A component that renders a sidebar. It toggles its visibility when the button is clicked.
@@ -18,6 +19,7 @@ function Sidebar({ setListSelected }) {
    * @function toggleBar
    * @description Toggles the visibility of the sidebar.
    */
+  const [lists, setLists] = useState([]);
   const toggleBar = () => {
     setOpenBar(!openBar);
   };
@@ -28,54 +30,20 @@ function Sidebar({ setListSelected }) {
     setCreateList(!createList);
   };
 
-  const taskHogar = [
-    {
-      id: 1,
-      name: "Comprar muebles para casa",
-      description: "Sofa, sillas, escritorios, etc. en Homecenter",
-      date: "2022-01-01",
-      state: true,
-    },
-    {
-      id: 2,
-      name: "Pintar una habitación",
-      description: "Pintar la habitación de mi casa de color blanco",
-      date: "2022-01-02",
-      state: true,
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post("http://localhost:8000/get-lists", {
+          id: localStorage.getItem("id"),
+        });
+        setLists(response.data.lists);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const tasksPersonales = [
-    {
-      id: 1,
-      name: "Comprar ropa para fiesta de cumpleaños",
-      description: "Camisas, pantalones, zapatillas, etc. en Zara",
-      date: "2022-01-01",
-      state: false,
-    },
-    {
-      id: 2,
-      name: "Hacer compras en Mercado Libre",
-      description: "Libros, ropa, zapatos, etc. en Mercado Libre",
-      date: "2022-01-02",
-      state: false,
-    },
-  ];
-
-  const lists = [
-    {
-      id: 1,
-      emoji: "👤",
-      name: "Personales",
-      task: tasksPersonales,
-    },
-    {
-      id: 2,
-      emoji: "🏡",
-      name: "Hogar",
-      task: taskHogar,
-    },
-  ];
+    fetchData();
+  }, []);
 
   const pickList = () => {
     toggleBar();
