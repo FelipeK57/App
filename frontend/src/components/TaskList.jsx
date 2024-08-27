@@ -1,19 +1,36 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useParams } from "react-router";
 import Task from "./Task";
 import CreateTask from "./CreateTask";
 import DetailsTask from "./DetailsTask";
 import axios from "axios";
+
 function TaskList() {
-  const params = useParams();
-  const location = useLocation();
-  const list = location.state.list;
-  const [tasks, setTasks] = useState(list.tasks);
+  const params = useParams(); // Obteniendo el id de la lista desde la URL
+  const [tasks, setTasks] = useState([]);
+  const [list, setList] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [taskSelected, setTaskSelected] = useState({});
   const [tasksPending, setTasksPending] = useState([]);
   const [tasksCompleted, setTasksCompleted] = useState([]);
+
+  // Fetch de la lista y sus tareas usando el id desde useParams
+  useEffect(() => {
+    const fetchList = async () => {
+      try {
+        const response = await axios.post("http://localhost:8000/get-list", {
+          id: params.id,
+        });
+        setList(response.data.list);
+        setTasks(response.data.list.tasks);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchList();
+  }, [params.id]);
 
   const changeState = async (taskId) => {
     try {
@@ -36,7 +53,6 @@ function TaskList() {
   };
 
   const updateTasks = (task) => {
-    console.log(task);
     setTasks((tasks) => [...tasks, task]);
   };
 
@@ -54,6 +70,19 @@ function TaskList() {
   const toggleDetails = (task) => {
     setShowDetails(!showDetails);
     setTaskSelected(task);
+  };
+
+  const deleteTask = async (taskId) => {
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+    try {
+      const response = await axios.post("http://localhost:8000/delete-task", {
+        id: taskId,
+      });
+      console.log("Respuesta del backend:", response.data);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
   };
 
   return (
@@ -112,6 +141,7 @@ function TaskList() {
               state={task.completed}
               onClick={() => changeState(task.id)}
               function={() => toggleDetails(task)}
+              deleteTask={() => deleteTask(task.id)}
             />
           ))
         ) : (
@@ -119,7 +149,7 @@ function TaskList() {
         )}
       </div>
       <p className="flex items-center gap-2 text-xl font-semibold">
-        <span className="text-4xl">✅</span> Completadas
+        <span className="text-4xl">✅</span>Tareas completadas
       </p>
       <div className="flex flex-col ml-2 gap-4">
         {tasksCompleted.length > 0 ? (
@@ -131,10 +161,11 @@ function TaskList() {
               state={task.completed}
               onClick={() => changeState(task.id)}
               function={() => toggleDetails(task)}
+              deleteTask={() => deleteTask(task.id)}
             />
           ))
         ) : (
-          <p>No has completado ninguna tarea</p>
+          <p>No hay tareas completadas</p>
         )}
       </div>
     </div>

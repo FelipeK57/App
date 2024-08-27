@@ -48,7 +48,24 @@ function Sidebar({ setListSelected }) {
   const pickList = () => {
     toggleBar();
     setListSelected(true);
-    localStorage.setItem("listSelected", true);
+  };
+
+  const createNewList = async () => {
+    const emoji = document.getElementById("emoji").value;
+    const name = document.getElementById("listName").value;
+    try {
+      const response = await axios.post("http://localhost:8000/create-list", {
+        name: name,
+        emoji: emoji,
+        id: localStorage.getItem("id"),
+      });
+      console.log(response.data);
+      setLists([...lists, response.data.list]);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+    toggleCreateList();
+    toggleBar();
   };
 
   return (
@@ -105,9 +122,8 @@ function Sidebar({ setListSelected }) {
             {lists.map((list) => (
               <Link
                 key={list.id}
-                onClick={pickList}
+                onClick={() => pickList(list.id)}
                 to={`/home/list/${list.id}`}
-                state={{ list: list }}
               >
                 <p className="flex items-center gap-2 text-xl font-semibold hover:bg-focus-sidebar-light dark:hover:bg-focus-sidebar-dark hover:bg-opacity-40 focus:bg-focus-sidebar-light p-2 rounded -lg dark:focus:bg-focus-sidebar-dark">
                   <span className="text-4xl">{list.emoji}</span> {list.name}
@@ -117,18 +133,20 @@ function Sidebar({ setListSelected }) {
             {createList ? (
               <div className="flex flex-col gap-2">
                 <input
+                  id="emoji"
                   className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
                   type="text"
                   placeholder="Ejemplo: 🙃..."
                 />
 
                 <input
+                  id="listName"
                   className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
                   type="text"
                   placeholder="Ejemplo: Trabajo..."
                 />
 
-                <Button content="Crear" />
+                <Button function={createNewList} content="Crear" />
               </div>
             ) : null}
             <button

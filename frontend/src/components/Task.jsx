@@ -3,7 +3,6 @@ import SettingsTask from "./SettingsTask";
 import CreateTask from "./CreateTask";
 import { useState } from "react";
 function Task(props) {
-
   const [showForm, setShowForm] = useState(false);
 
   const toggleForm = () => {
@@ -22,13 +21,26 @@ function Task(props) {
           id="check"
           onClick={props.onClick}
           className={`${
-            props.state ? "bg-green-600 hover:bg-red-600" : "bg-slate-500 hover:bg-green-600"
+            props.state
+              ? "bg-green-600 hover:bg-red-600"
+              : "bg-slate-500 hover:bg-green-600"
           } p-3 rounded-full  transition-all`}
         ></button>
-        <p className={`${props.state ? "line-through text-text-light-lighter dark:text-text-dark-lighter" : ""} flex-1 font-bold`}>{props.name}</p>
+        <p
+          className={`${
+            props.state
+              ? "line-through text-text-light-lighter dark:text-text-dark-lighter"
+              : ""
+          } flex-1 font-bold`}
+        >
+          {props.name}
+        </p>
       </div>
       <p className="mr-4 font-semibold">{props.date}</p>
-      <SettingsTask function={props.function} />
+      <SettingsTask
+        functionDelete={props.deleteTask}
+        function={props.function}
+      />
     </div>
   );
 }
@@ -39,6 +51,7 @@ Task.propTypes = {
   state: PropTypes.bool.isRequired,
   onClick: PropTypes.func,
   function: PropTypes.func,
+  deleteTask: PropTypes.func,
 };
 
 export default Task;

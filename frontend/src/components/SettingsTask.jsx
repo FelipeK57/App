@@ -7,6 +7,7 @@ function SettingsTask(props) {
   const deleteTask = (event) => {
     event.preventDefault();
     setOpen(false);
+    props.functionDelete();
   };
 
   const toggle = () => setOpen(!open);
@@ -73,6 +74,7 @@ function SettingsTask(props) {
 
 SettingsTask.propTypes = {
   function: PropTypes.func,
+  functionDelete: PropTypes.func,
 };
 
 export default SettingsTask;

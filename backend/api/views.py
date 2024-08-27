@@ -110,12 +110,17 @@ def delete_task(request):
 def create_list(request):
     name = request.data.get('name')
     emoji = request.data.get('emoji')
-
-    if not name:
-        return Response ({'message': 'List name is required'})
+    id = request.data.get('id')
     
+    Users.objects.filter(id=id).first()
+
     list = List(name=name, emoji=emoji)
     list.save()
+
+    user = Users.objects.filter(id=id).first()
+    user.listas.add(list)
+
+    user.save()
 
     serializer = ListSerializer(list)
 
@@ -171,6 +176,15 @@ def get_lists(request):
 
     return Response ({'lists': serializer.data})
 
-
+@api_view(['POST'])
+def get_list(request):
+    id = request.data.get('id')
     
+    if not id:
+        return Response ({'message': 'List id is required'})
+    
+    list = List.objects.filter(id=id).first()
+    serializer = ListSerializer(list)
+    
+    return Response ({'list': serializer.data})
 
