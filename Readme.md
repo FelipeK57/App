@@ -12,5 +12,7 @@ link figma: https://www.figma.com/design/B7KYQwyjJWH4WwWnZBTI2R/ToDoList?node-id
 # Asi esta desarrollada la web
 # Tecnologias
 Lenguajes usados: HTML, CSS, JavaScript y Python
+
 Frameworks: React, Tailwind CSS y Django
+
 Librerias: Tailwind Animate, React Router, Axios y Django Rest Framework  
