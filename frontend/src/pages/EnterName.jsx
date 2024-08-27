@@ -2,9 +2,23 @@ import { useState } from "react";
 import ToggleMode from "@/components/ToggleMode";
 import Button from "@/components/Button";
 import axios from "axios";
+/**
+ * Renders a form for the user to enter their name and submit it to the server.
+ * If the name is already taken, an error message is displayed and the user is prompted to try again.
+ * If the name is successfully submitted, the user is redirected to the home page.
+ *
+ * @return {JSX.Element} The rendered form component.
+ */
 function EnterName() {
   const [error, setError] = useState(false);
   const [messageError, setMessageError] = useState("");
+  /**
+   * Saves the user's name by sending a POST request to the server.
+   * If the name is already taken, it displays an error message.
+   * If the name is successfully submitted, it redirects the user to the home page.
+   *
+   * @return {Promise<void>} A promise that resolves when the name is saved or an error occurs
+   */
   const saveName = async () => {
     if (!document.getElementById("name").value) {
       setError(true);
@@ -45,11 +59,7 @@ function EnterName() {
             type="text"
             placeholder="Ejemplo: Esteban, Pablo..."
           />
-          {error && (
-            <p className="text-red-600 animate-fade">
-              {messageError}
-            </p>
-          )}
+          {error && <p className="text-red-600 animate-fade">{messageError}</p>}
         </div>
         <div className="animate-fade-up">
           <Button function={saveName} content="Continuar" />

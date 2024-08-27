@@ -1,9 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
+/**
+ * A React component that renders a settings task with a dropdown menu.
+ *
+ * @param {object} props - The component props.
+ * @param {function} props.functionDelete - A callback function to delete a task.
+ * @param {function} props.function - A callback function to view task details.
+ * @return {JSX.Element} The rendered settings task component.
+ */
 function SettingsTask(props) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  /**
+   * Deletes a task by preventing the default event behavior, closing the dropdown menu, and invoking the functionDelete callback.
+   *
+   * @param {object} event - The event object triggered by the delete action.
+   * @return {void} No return value.
+   */
   const deleteTask = (event) => {
     event.preventDefault();
     setOpen(false);
@@ -12,6 +26,12 @@ function SettingsTask(props) {
 
   const toggle = () => setOpen(!open);
 
+  /**
+   * Handles the click event outside the dropdown menu.
+   *
+   * @param {Event} event - The click event.
+   * @return {void}
+   */
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setOpen(false);
@@ -25,6 +45,12 @@ function SettingsTask(props) {
     };
   }, []);
 
+  /**
+   * Views task details by preventing the default event behavior, closing the dropdown menu, and invoking the function callback.
+   *
+   * @param {object} event - The event object triggered by the view details action.
+   * @return {void} No return value.
+   */
   const viewDetails = (event) => {
     event.preventDefault();
     setOpen(false);
@@ -32,7 +58,10 @@ function SettingsTask(props) {
   };
 
   return (
-    <div ref={dropdownRef} className="flex transition-all items-center hover:bg-gray-400 dark:hover:bg-gray-500 rounded-full">
+    <div
+      ref={dropdownRef}
+      className="flex transition-all items-center hover:bg-gray-400 dark:hover:bg-gray-500 rounded-full"
+    >
       <button onClick={toggle} className="text-text-light dark:text-text-dark">
         <svg
           xmlns="http://www.w3.org/2000/svg"

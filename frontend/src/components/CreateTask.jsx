@@ -1,13 +1,48 @@
 import PropTypes from "prop-types";
 import Button from "./Button";
 import axios from "axios";
+import { useState } from "react";
+/**
+ * A React functional component to create a new task.
+ *
+ * @param {object} props - The component props.
+ * @param {function} props.updateTasks - A function to update the tasks list.
+ * @param {function} props.onClose - A function to close the component.
+ * @param {number} props.list_id - The ID of the list where the task will be created.
+ * @return {JSX.Element} The JSX element of the component.
+ */
 function CreateTask(props) {
+  const [error, setError] = useState(false);
+  const [messageError, setMessageError] = useState("");
+    /**
+   * Handles the submission of a new task form.
+   *
+   * Validates the title and description fields, displays an error message if either field is empty,
+   * and creates a new task via an HTTP POST request to the server if both fields are valid.
+   *
+   * @return {void}
+   */
   const handleSubmit = async () => {
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
-    props.onClose();
+
     console.log(title, description);
     try {
+      if (!title && !description) {
+        setError(true);
+        setMessageError("Todos los campos son obligatorios");
+        return;
+      }
+      if (!title) {
+        setError(true);
+        setMessageError("El título es obligatorio");
+        return;
+      }
+      if (!description) {
+        setError(true);
+        setMessageError("La descripción es obligatoria");
+        return;
+      }
       const response = await axios.post("http://localhost:8000/create-task", {
         tittle: title,
         description: description,
@@ -15,6 +50,7 @@ function CreateTask(props) {
       });
       const task = response.data.task;
       props.updateTasks(task);
+      props.onClose();
     } catch (error) {
       console.log(error);
     }
@@ -50,17 +86,26 @@ function CreateTask(props) {
         <label>Titulo</label>
         <input
           id="title"
-          className="p-2 focus:ring-2 text-base ring-gray-600 focus:outline-none border-2 border-gray-500 bg-slate-50 text-gray-700 dark:bg-slate-950 dark:text-gray-200 rounded-lg shadow-xl"
+          className={`p-2 focus:ring-2 text-base ring-gray-600 focus:outline-none border-2 border-gray-500 bg-slate-50 text-gray-700 dark:bg-slate-950 dark:text-gray-200 rounded-lg shadow-xl ${
+            error ? "border-red-600" : ""
+          } `}
           type="text"
           placeholder="Ejemplo: Tarea 1..."
         />
         <label>Descripción</label>
         <textarea
           id="description"
-          className="h-full resize-none p-2 text-base focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 bg-slate-50 text-gray-700 dark:bg-slate-950 dark:text-gray-200 rounded-lg shadow-xl"
+          className={`h-full resize-none p-2 text-base focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 bg-slate-50 text-gray-700 dark:bg-slate-950 dark:text-gray-200 rounded-lg shadow-xl ${
+            error ? "border-red-600" : ""
+          } `}
           type="text"
           placeholder="Ejemplo: Descripcion tarea 1..."
         />
+        {error ? (
+          <p className="text-red-600 animate-fade-down text-lg lg:text-xl font-semibold">
+            {messageError}
+          </p>
+        ) : null}
       </form>
       <div className="flex gap-10 justify-end">
         <button
@@ -78,7 +123,7 @@ function CreateTask(props) {
 CreateTask.propTypes = {
   onClose: PropTypes.func,
   list_id: PropTypes.string,
-  updateTasks: PropTypes.func
+  updateTasks: PropTypes.func,
 };
 
 export default CreateTask;

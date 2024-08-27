@@ -10,35 +10,48 @@ import SettingsList from "./SettingList";
  * @returns {JSX.Element} The JSX code for the component.
  */
 function Sidebar({ setListSelected }) {
-  /**
-   * @param {boolean} openBar Whether the sidebar is open or not.
-   * @type {boolean}
-   */
   const [openBar, setOpenBar] = useState(false);
-
+  const [lists, setLists] = useState([]);
   /**
    * @function toggleBar
    * @description Toggles the visibility of the sidebar.
    */
-  const [lists, setLists] = useState([]);
   const toggleBar = () => {
+    // Toggle the value of openBar
     setOpenBar(!openBar);
   };
 
   const [createList, setCreateList] = useState(false);
+  const [error, setError] = useState(false);
+  const [messageError, setMessageError] = useState("");
 
+  /**
+   * @function toggleCreateList
+   * @description Toggles the value of createList state variable and resets the error state variable.
+   */
   const toggleCreateList = () => {
+    // Reset the error state variable
+    setError(false);
+    // Toggle the value of createList state variable
     setCreateList(!createList);
   };
 
   useEffect(() => {
+    /**
+     * @function fetchData
+     * @description Fetches the lists from the backend and updates the state.
+     * @returns {Promise<void>} A promise that resolves when the data is fetched and the state is updated.
+     */
     const fetchData = async () => {
       try {
+        // Send a POST request to the backend to get the lists
         const response = await axios.post("http://localhost:8000/get-lists", {
-          id: localStorage.getItem("id"),
+          id: localStorage.getItem("id"), // Use the user's ID from localStorage
         });
+        // Update the state with the fetched lists
         setLists(response.data.lists);
       } catch (error) {
+        // Log the error to the console
         console.log(error);
       }
     };
@@ -46,39 +59,97 @@ function Sidebar({ setListSelected }) {
     fetchData();
   }, []);
 
+  /**
+   * @function pickList
+   * @description Toggles the bar and sets the listSelected state variable to true.
+   * @returns {void}
+   */
   const pickList = () => {
+    // Toggle the bar
     toggleBar();
+    // Set the listSelected state variable to true
     setListSelected(true);
   };
 
+  /**
+   * @function createNewList
+   * @description Creates a new list and updates the state.
+   * @returns {Promise<void>} A promise that resolves when the list is created and the state is updated.
+   */
   const createNewList = async () => {
+    // Get the values of emoji and name from the form inputs
     const emoji = document.getElementById("emoji").value;
     const name = document.getElementById("listName").value;
+
     try {
+      // Check if emoji and name are not provided
+      if (!emoji && !name) {
+        setError(true);
+        setMessageError("Todos los campos son obligatorios");
+        return;
+      }
+      // Check if name is not provided
+      if (!name) {
+        setError(true);
+        setMessageError("El nombre es obligatorio");
+        return;
+      }
+      // Check if emoji is not provided
+      if (!emoji) {
+        setError(true);
+        setMessageError("El emoji es obligatorio");
+        return;
+      }
+
+      // Send a POST request to the backend to create the list
       const response = await axios.post("http://localhost:8000/create-list", {
-        name: name,
-        emoji: emoji,
-        id: localStorage.getItem("id"),
+        name: name, // Add the name of the list
+        emoji: emoji, // Add the emoji of the list
+        id: localStorage.getItem("id"), // Add the user's ID from localStorage
       });
+
+      // Log the response data to the console
       console.log(response.data);
+
+      // Clear the error state
+      setError(false);
+
+      // Add the newly created list to the lists state array
       setLists([...lists, response.data.list]);
     } catch (error) {
+      // Log the error message from the backend to the console
       console.log(error.response.data.message);
     }
+
+    // Toggle the createList state variable to hide the form
     toggleCreateList();
+
+    // Toggle the bar to hide the form
     toggleBar();
   };
 
+  /**
+   * @function deleteList
+   * @description Deletes a list from the state and sends a request to the backend to delete the list.
+   * @param {string} listId - The ID of the list to be deleted.
+   * @returns {Promise<void>} A promise that resolves when the list is deleted from the state and the backend.
+   */
   const deleteList = async (listId) => {
+    // Filter out the list to be deleted from the lists state array
     const updateList = lists.filter((list) => list.id !== listId);
+    // Update the lists state array with the filtered list
     setLists(updateList);
     try {
+      // Send a POST request to the backend to delete the list
       const response = await axios.post("http://localhost:8000/delete-list", {
         id: listId,
       });
+      // Log the response data from the backend
       console.log(response.data);
+      // Reset the listSelected state variable
       setListSelected(false);
     } catch (error) {
+      // Log any errors that occur during the request
       console.log(error);
     }
   };
@@ -142,19 +213,29 @@ function Sidebar({ setListSelected }) {
               <div className="flex flex-col gap-2">
                 <input
                   id="emoji"
-                  className="p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  className={`p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl ${
+                    error && "border-2 border-red-600"
+                  } `}
+                  maxLength={2}
                   type="text"
                   placeholder="Ejemplo: 🙃..."
                 />
 
                 <input
                   id="listName"
-                  className="p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  className={`p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl ${
+                    error && "border-2 border-red-600"
+                  } `}
                   type="text"
                   placeholder="Ejemplo: Trabajo..."
                 />
 
                 <Button function={createNewList} content="Crear" />
+                {error && (
+                  <p className="text-red-600 animate-fade-down text-base lg:text-lg font-semibold">
+                    {messageError}
+                  </p>
+                )}
               </div>
             ) : null}
             <button

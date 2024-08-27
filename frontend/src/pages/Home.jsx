@@ -3,6 +3,11 @@ import EnterName from "./EnterName";
 import Sidebar from "@/components/Sidebar";
 import { Outlet } from "react-router";
 import ToggleMode from "@/components/ToggleMode";
+/**
+ * A React component that renders the home page, handling user authentication and theme selection.
+ *
+ * @return {JSX.Element} The rendered home page component.
+ */
 function Home() {
   const [listSelected, setListSelected] = useState(false);
 

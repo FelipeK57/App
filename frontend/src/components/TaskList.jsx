@@ -5,6 +5,11 @@ import CreateTask from "./CreateTask";
 import DetailsTask from "./DetailsTask";
 import axios from "axios";
 
+/**
+ * TaskList component that displays a list of tasks and allows users to create, update, and delete tasks.
+ *
+ * @return {JSX.Element} The JSX element representing the TaskList component.
+ */
 function TaskList() {
   const params = useParams();
   const [tasks, setTasks] = useState([]);
@@ -15,9 +20,17 @@ function TaskList() {
   const [tasksPending, setTasksPending] = useState([]);
   const [tasksCompleted, setTasksCompleted] = useState([]);
 
+  const [error, setError] = useState(false);
+  const [messageError, setMessageError] = useState("");
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  /**
+   * Fetches a list from the backend and updates the component's state.
+   *
+   * @return {Promise<void>} A promise that resolves when the list is fetched and the state is updated.
+   */
   useEffect(() => {
     const fetchList = async () => {
       try {
@@ -34,6 +47,12 @@ function TaskList() {
     fetchList();
   }, [params.id]);
 
+  /**
+   * Changes the state of a task by sending a POST request to the backend to update the task's completion status.
+   *
+   * @param {number} taskId - The ID of the task to be updated.
+   * @return {Promise<void>} A promise that resolves when the task's state is updated.
+   */
   const changeState = async (taskId) => {
     try {
       const task = tasks.find((task) => task.id === taskId);
@@ -54,6 +73,12 @@ function TaskList() {
     }
   };
 
+  /**
+   * Updates the tasks state by adding a new task.
+   *
+   * @param {object} task - The new task to be added to the tasks state.
+   * @return {void} No return value, updates the tasks state directly.
+   */
   const updateTasks = (task) => {
     setTasks((tasks) => [...tasks, task]);
   };
@@ -65,25 +90,58 @@ function TaskList() {
     setTasksCompleted(completedTasks);
   }, [tasks]);
 
+  /**
+   * Toggles the visibility of the form.
+   *
+   * @return {void} No return value, updates the showForm state directly.
+   */
   const toggleForm = () => {
     setShowForm(!showForm);
   };
 
+  /**
+   * Toggles the visibility of task details and updates the task selection.
+   *
+   * @param {object} task - The task object to be selected.
+   * @return {void} No return value, updates the state directly.
+   */
   const toggleDetails = (task) => {
+    setError(false);
     setTaskSelected(task);
     setTitle(task.tittle);
     setDescription(task.description);
     setShowDetails(!showDetails);
   };
 
+  /**
+   * Updates a task's details by sending a POST request to the backend.
+   *
+   * @return {void} No return value, updates the task state directly.
+   */
   const updateTaskDetails = async () => {
     try {
+      if (!title && !description) {
+        setError(true);
+        setMessageError("Todos los campos son obligatorios");
+        return;
+      }
+      if (!title) {
+        setError(true);
+        setMessageError("El título es obligatorio");
+        return;
+      }
+      if (!description) {
+        setError(true);
+        setMessageError("La descripción es obligatoria");
+        return;
+      }
       const response = await axios.post("http://localhost:8000/update-task", {
         id: taskSelected.id,
         tittle: title,
         description: description,
       });
       setTaskSelected(response.data.task);
+      setError(false);
       const updatedTasks = tasks.map((task) =>
         task.id === taskSelected.id ? response.data.task : task
       );
@@ -95,14 +153,32 @@ function TaskList() {
     }
   };
 
+  /**
+   * Handles changes to the task title by updating the title state.
+   *
+   * @param {string} newTitle - The new title to be set.
+   * @return {void} No return value, updates the title state directly.
+   */
   const handleTitleChange = (newTitle) => {
     setTitle(newTitle);
   };
 
+  /**
+   * Handles changes to the task description by updating the description state.
+   *
+   * @param {string} newDescription - The new description to be set.
+   * @return {void} No return value, updates the description state directly.
+   */
   const handleDescriptionChange = (newDescription) => {
     setDescription(newDescription);
   };
 
+  /**
+   * Deletes a task by its ID and updates the tasks state.
+   *
+   * @param {number} taskId - The ID of the task to be deleted.
+   * @return {Promise<void>} A promise that resolves when the task is deleted and the tasks state is updated.
+   */
   const deleteTask = async (taskId) => {
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
     setTasks(updatedTasks);
@@ -137,6 +213,8 @@ function TaskList() {
             onTitleChange={handleTitleChange}
             onDescriptionChange={handleDescriptionChange}
             deleteTask={() => deleteTask(taskSelected.id)}
+            error={error}
+            messageError={messageError}
           />
         </div>
       ) : null}

@@ -1,9 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
+/**
+ * A React component that renders a settings list with a dropdown menu.
+ *
+ * @param {object} props - The component props.
+ * @param {function} props.functionDelete - A callback function to delete a task.
+ * @return {JSX.Element} The rendered settings list component.
+ */
 function SettingsList(props) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+    /**
+   * Deletes a task by preventing the default event behavior, closing the dropdown menu, and invoking the provided delete function.
+   *
+   * @param {object} event - The event object triggered by the delete action.
+   * @return {void} No return value, as the function performs an action and does not produce a result.
+   */
   const deleteTask = (event) => {
     event.preventDefault();
     setOpen(false);
@@ -11,7 +24,13 @@ function SettingsList(props) {
   };
 
   const toggle = () => setOpen(!open);
-
+  
+    /**
+   * Handles the click event outside the dropdown menu.
+   *
+   * @param {object} event - The event object triggered by the click action.
+   * @return {void} No return value, as the function performs an action and does not produce a result.
+   */
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setOpen(false);

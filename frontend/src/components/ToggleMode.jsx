@@ -1,4 +1,9 @@
 import useToggleMode from "../hooks/useToggleMode";
+/**
+ * A React component that toggles between dark and light modes.
+ *
+ * @return {JSX.Element} The rendered toggle mode component.
+ */
 function ToggleMode() {
   const [darkMode, toggleDarkMode] = useToggleMode();
 
