@@ -8,3 +8,9 @@ link documento: https://docs.google.com/document/d/1nGsvaVnfX8igwU4gLCpqPP-0v0Sk
 
 # Visualiza nuestro diseño en Figma
 link figma: https://www.figma.com/design/B7KYQwyjJWH4WwWnZBTI2R/ToDoList?node-id=0-1&t=u7q4eUwZIgTI1RWT-1
+
+# Asi esta desarrollada la web
+# Tecnologias
+Lenguajes usados: HTML, CSS, JavaScript y Python
+Frameworks: React, Tailwind CSS y Django
+Librerias: Tailwind Animate, React Router, Axios y Django Rest Framework  
