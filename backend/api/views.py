@@ -188,3 +188,23 @@ def get_list(request):
     
     return Response ({'list': serializer.data})
 
+@api_view(['POST'])
+def delete_data(request):
+    id = request.data.get('id')
+
+    if not id:
+        return Response ({'message': 'User id is required'})
+    
+    user = Users.objects.filter(id=id).first()
+
+    if not user:
+        return Response ({'message': 'User not found'})
+
+    for lista in user.listas.all():
+        lista.tasks.all().delete()
+        
+    user.listas.all().delete()
+    
+    user.delete()
+
+    return Response ({'message': 'User deleted successfully'})

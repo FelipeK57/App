@@ -154,6 +154,25 @@ function Sidebar({ setListSelected }) {
     }
   };
 
+  /**
+   * Deletes user data from the backend and clears local storage.
+   *
+   * @return {Promise<void>} A promise that resolves when the data is deleted and local storage is cleared.
+   */
+  const deleteData = async () => {
+    localStorage.getItem("id");
+    try {
+      const response = await axios.post("http://localhost:8000/delete-data", {
+        id: localStorage.getItem("id"),
+      });
+      console.log(response.data);
+      window.location.reload();
+      localStorage.clear();
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
   return (
     <div>
       {/* Main Sidebar */}
@@ -260,13 +279,7 @@ function Sidebar({ setListSelected }) {
             </button>
           </nav>
           <div className="flex grow items-end">
-            <Button
-              content="Eliminar datos"
-              function={() => {
-                localStorage.setItem("name", "");
-                window.location.href = "/home";
-              }}
-            />
+            <Button content="Eliminar datos" function={deleteData} />
           </div>
         </div>
       </aside>
