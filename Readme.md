@@ -1,3 +1,7 @@
+# Bienvenido a NotesEasy.
+
+![imagen-home](imagen.png)
+
 # Instrucciones de ejecución
 
 # Ejecución Frontend
