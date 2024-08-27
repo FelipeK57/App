@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-function SettingsTask(props) {
+function SettingsList(props) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -25,14 +25,11 @@ function SettingsTask(props) {
     };
   }, []);
 
-  const viewDetails = (event) => {
-    event.preventDefault();
-    setOpen(false);
-    props.function();
-  };
-
   return (
-    <div ref={dropdownRef} className="flex transition-all items-center hover:bg-gray-400 dark:hover:bg-gray-500 rounded-full">
+    <div
+      ref={dropdownRef}
+      className="flex items-center hover:bg-gray-400 dark:hover:bg-gray-500 transition-all rounded-full"
+    >
       <button onClick={toggle} className="text-text-light dark:text-text-dark">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -51,20 +48,14 @@ function SettingsTask(props) {
       </button>
       {open && (
         <div
-          className="flex animate-flip-up animate-duration-200 flex-col w-36 absolute right-4 bottom-12 bg-slate-700 dark:bg-button-dark text-text-dark dark:text-text-light text-sm rounded-lg shadow-lg"
+          className="flex animate-flip-up animate-duration-200 flex-col w-36 absolute right-10 mb-16 bg-slate-700 dark:bg-button-dark text-text-dark dark:text-text-light text-sm rounded-lg shadow-lg"
           role="listbox"
         >
           <button
-            className="p-2 font-semibold rounded-t-lg"
-            onClick={viewDetails}
-          >
-            Ver detalles
-          </button>
-          <button
-            className="p-2 font-semibold rounded-b-lg text-slate-300 bg-red-600"
+            className="p-2 font-semibold rounded-lg text-slate-300 bg-red-600"
             onClick={deleteTask}
           >
-            Eliminar tarea
+            Eliminar lista
           </button>
         </div>
       )}
@@ -72,9 +63,9 @@ function SettingsTask(props) {
   );
 }
 
-SettingsTask.propTypes = {
+SettingsList.propTypes = {
   function: PropTypes.func,
   functionDelete: PropTypes.func,
 };
 
-export default SettingsTask;
+export default SettingsList;

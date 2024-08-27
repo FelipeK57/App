@@ -3,6 +3,7 @@ import Button from "./Button";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import SettingsList from "./SettingList";
 /**
  * @function Sidebar
  * @description A component that renders a sidebar. It toggles its visibility when the button is clicked.
@@ -68,6 +69,20 @@ function Sidebar({ setListSelected }) {
     toggleBar();
   };
 
+  const deleteList = async (listId) => {
+    const updateList = lists.filter((list) => list.id !== listId);
+    setLists(updateList);
+    try {
+      const response = await axios.post("http://localhost:8000/delete-list", {
+        id: listId,
+      });
+      console.log(response.data);
+      setListSelected(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
       {/* Main Sidebar */}
@@ -78,21 +93,8 @@ function Sidebar({ setListSelected }) {
       >
         <div className="flex flex-col gap-6 w-full">
           <div className="flex justify-between items-center">
-            <h1 className="md:text-3xl text-2xl font-bold text-text-light dark:text-text-dark flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="md:size-10 size-8"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                />
-              </svg>
+            <h1 className="md:text-2xl lg:text-3xl text-3xl font-bold text-text-light dark:text-text-dark flex items-center gap-2">
+              <span className="text-5xl">🧑‍💻</span>
               NotesEasy.
             </h1>
             <button
@@ -120,28 +122,34 @@ function Sidebar({ setListSelected }) {
           </p>
           <nav className="flex flex-col gap-6 text-text-light dark:text-text-dark">
             {lists.map((list) => (
-              <Link
+              <div
+                className="flex items-center hover:bg-focus-sidebar-light p-2 pr-4 rounded-lg dark:hover:bg-focus-sidebar-dark hover:bg-opacity-40"
                 key={list.id}
-                onClick={() => pickList(list.id)}
-                to={`/home/list/${list.id}`}
               >
-                <p className="flex items-center gap-2 text-xl font-semibold hover:bg-focus-sidebar-light dark:hover:bg-focus-sidebar-dark hover:bg-opacity-40 focus:bg-focus-sidebar-light p-2 rounded -lg dark:focus:bg-focus-sidebar-dark">
-                  <span className="text-4xl">{list.emoji}</span> {list.name}
-                </p>
-              </Link>
+                <Link
+                  onClick={() => pickList(list.id)}
+                  to={`/home/list/${list.id}`}
+                  className="flex grow justify-start"
+                >
+                  <p className="flex items-center gap-2 md:gap-0 text-xl md:text-lg font-semibold">
+                    <span className="text-4xl">{list.emoji}</span> {list.name}
+                  </p>
+                </Link>
+                <SettingsList functionDelete={() => deleteList(list.id)} />
+              </div>
             ))}
             {createList ? (
               <div className="flex flex-col gap-2">
                 <input
                   id="emoji"
-                  className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  className="p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
                   type="text"
                   placeholder="Ejemplo: 🙃..."
                 />
 
                 <input
                   id="listName"
-                  className="p-2  bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
+                  className="p-2 bg-sidebar-light dark:bg-sidebar-dark focus:ring-2 ring-gray-600 focus:outline-none border-2 border-gray-500 text-gray-700  dark:text-gray-200 rounded-lg shadow-xl"
                   type="text"
                   placeholder="Ejemplo: Trabajo..."
                 />

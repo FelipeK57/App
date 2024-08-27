@@ -6,7 +6,7 @@ import DetailsTask from "./DetailsTask";
 import axios from "axios";
 
 function TaskList() {
-  const params = useParams(); // Obteniendo el id de la lista desde la URL
+  const params = useParams();
   const [tasks, setTasks] = useState([]);
   const [list, setList] = useState({});
   const [showForm, setShowForm] = useState(false);
@@ -15,7 +15,9 @@ function TaskList() {
   const [tasksPending, setTasksPending] = useState([]);
   const [tasksCompleted, setTasksCompleted] = useState([]);
 
-  // Fetch de la lista y sus tareas usando el id desde useParams
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
   useEffect(() => {
     const fetchList = async () => {
       try {
@@ -68,8 +70,37 @@ function TaskList() {
   };
 
   const toggleDetails = (task) => {
-    setShowDetails(!showDetails);
     setTaskSelected(task);
+    setTitle(task.tittle);
+    setDescription(task.description);
+    setShowDetails(!showDetails);
+  };
+
+  const updateTaskDetails = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/update-task", {
+        id: taskSelected.id,
+        tittle: title,
+        description: description,
+      });
+      setTaskSelected(response.data.task);
+      const updatedTasks = tasks.map((task) =>
+        task.id === taskSelected.id ? response.data.task : task
+      );
+      setTasks(updatedTasks);
+      console.log("Respuesta del backend:", response.data.task);
+      setShowDetails(false);
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const handleTitleChange = (newTitle) => {
+    setTitle(newTitle);
+  };
+
+  const handleDescriptionChange = (newDescription) => {
+    setDescription(newDescription);
   };
 
   const deleteTask = async (taskId) => {
@@ -80,6 +111,7 @@ function TaskList() {
         id: taskId,
       });
       console.log("Respuesta del backend:", response.data);
+      setShowDetails(false);
     } catch (error) {
       console.log(error.response.data.message);
     }
@@ -99,9 +131,12 @@ function TaskList() {
       {showDetails ? (
         <div className="fixed flex justify-center items-center w-full inset-0 bg-slate-800 bg-opacity-40 z-[1000]">
           <DetailsTask
-            title={taskSelected.tittle}
-            description={taskSelected.description}
-            function={toggleDetails}
+            title={title}
+            description={description}
+            function={updateTaskDetails}
+            onTitleChange={handleTitleChange}
+            onDescriptionChange={handleDescriptionChange}
+            deleteTask={() => deleteTask(taskSelected.id)}
           />
         </div>
       ) : null}
